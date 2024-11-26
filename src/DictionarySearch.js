@@ -4,40 +4,51 @@ const DictionarySearch = () => {
   const [searchTerm, setSearchTerm] = useState(""); 
   const [result, setResult] = useState(""); 
   const [error, setError] = useState(""); 
-  const API_KEY = "8e1oeft5a9242f18ee913e0b45ad1a06";
-  const API_URL = "https://api.shecodes.io/dictionary/v1/define";
 
-  
+  const API_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/";
+
   const handleSearch = async () => {
-    if (!searchTerm) {
-      setError("Please enter a word.");
+    if (!searchTerm.trim()) {
+      setError("Please enter a valid word.");
       setResult("");
       return;
     }
+
     setError(""); 
+    setResult("Loading..."); 
 
     try {
-      const response = await fetch(
-        `${API_URL}?word=${searchTerm}&key=${API_KEY}`
-      );
+      const response = await fetch(`${API_URL}${searchTerm.trim()}`);
+
+      if (!response.ok) {
+       
+        if (response.status === 404) {
+          setResult(`No definitions found for "${searchTerm}".`);
+        } else {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+        return;
+      }
+
       const data = await response.json();
 
-      if (data && data.word) {
-        const definitions = data.definitions.map((def, index) => (
-          <p key={index}>
-            <strong>{index + 1}:</strong> {def.definition}
-          </p>
-        ));
+      
+      if (data && data[0] && data[0].meanings.length > 0) {
+        const firstMeaning = data[0].meanings[0];
+        const firstDefinition =
+          firstMeaning.definitions[0]?.definition ||
+          "Definition not available.";
         setResult(
           <div>
-            <h3>Definitions for "{data.word}":</h3>
-            {definitions}
+            <h3>Definition for "{data[0].word}":</h3>
+            <p>{firstDefinition}</p>
           </div>
         );
       } else {
-        setResult("No definitions found.");
+        setResult(`No definitions found for "${searchTerm}".`);
       }
     } catch (err) {
+      console.error("Error occurred:", err); 
       setError(
         "An error occurred while fetching the definition. Please try again."
       );
@@ -46,40 +57,39 @@ const DictionarySearch = () => {
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Dictionary App</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {result || <h2>Type a word to search</h2>}
-      <div>
-        <input
-          type="text"
-          placeholder="Enter a word"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            padding: "10px",
-            fontSize: "16px",
-            width: "300px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-          }}
-        />
-        <button
-          onClick={handleSearch}
-          style={{
-            padding: "10px 20px",
-            marginLeft: "10px",
-            fontSize: "16px",
-            backgroundColor: "#007BFF",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          Search
-        </button>
-      </div>
+    <div className="app-container">
+      <header className="app-header">
+        <h1>Dictionary App</h1>
+      </header>
+      <main>
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Enter a word"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)} 
+          />
+          <button onClick={handleSearch}>Search</button>
+        </div>
+        {error && <p className="error">{error}</p>}
+        <div className="result-container">
+          {result || <p>Type a word to search</p>}
+        </div>
+      </main>
+      <footer className="app-footer">
+        <p>
+          Coded by <strong>Shanice Jones</strong> | Hosted on
+          <a href="" target="_blank" rel="noopener noreferrer">
+            {" "}
+            GitHub{" "}
+          </a>{" "}
+          and
+          <a href="" target="_blank" rel="noopener noreferrer">
+            {" "}
+            Netlify{" "}
+          </a>
+        </p>
+      </footer>
     </div>
   );
 };
