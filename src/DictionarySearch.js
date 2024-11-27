@@ -4,10 +4,12 @@ const DictionarySearch = () => {
   const [searchTerm, setSearchTerm] = useState(""); 
   const [result, setResult] = useState(""); 
   const [error, setError] = useState(""); 
-
   const API_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/";
 
   
+  const capitalize = (word) => word.charAt(0).toUpperCase() + word.slice(1);
+
+
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
       setError("Please enter a valid word.");
@@ -15,16 +17,16 @@ const DictionarySearch = () => {
       return;
     }
 
-    setError(""); 
+    setError("");
     setResult("Loading..."); 
 
     try {
       const response = await fetch(`${API_URL}${searchTerm.trim()}`);
 
       if (!response.ok) {
-       
+        
         if (response.status === 404) {
-          setResult(`No definitions found for "${searchTerm}".`);
+          setResult(`No definitions found for "${capitalize(searchTerm)}".`);
         } else {
           throw new Error(`HTTP Error: ${response.status}`);
         }
@@ -33,19 +35,28 @@ const DictionarySearch = () => {
 
       const data = await response.json();
 
+      
       if (data && data[0] && data[0].meanings.length > 0) {
-        const firstMeaning = data[0].meanings[0];
+        const correctedWord = capitalize(data[0].word);
+        const partOfSpeech =
+          data[0].meanings[0].partOfSpeech || "Unknown part of speech";
         const firstDefinition =
-          firstMeaning.definitions[0]?.definition ||
+          data[0].meanings[0].definitions[0]?.definition ||
           "Definition not available.";
+
         setResult(
           <div>
-            <h3>Definition for "{data[0].word}":</h3>
-            <p>{firstDefinition}</p>
+            <h2>{correctedWord}</h2>
+            <p>
+              <strong>Part of Speech:</strong> {partOfSpeech}
+            </p>
+            <p>
+              <strong>Definition:</strong> {firstDefinition}
+            </p>
           </div>
         );
       } else {
-        setResult(`No definitions found for "${searchTerm}".`);
+        setResult(`No definitions found for "${capitalize(searchTerm)}".`);
       }
     } catch (err) {
       console.error("Error occurred:", err); 
@@ -67,7 +78,7 @@ const DictionarySearch = () => {
             type="text"
             placeholder="Enter a word"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)} 
           />
           <button onClick={handleSearch}>Search</button>
         </div>
@@ -84,7 +95,8 @@ const DictionarySearch = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            GitHub
+            {" "}
+            GitHub{" "}
           </a>{" "}
           and
           <a
@@ -92,7 +104,8 @@ const DictionarySearch = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Netlify
+            {" "}
+            Netlify{" "}
           </a>
         </p>
       </footer>
