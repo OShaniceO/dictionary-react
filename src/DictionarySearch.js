@@ -7,6 +7,7 @@ const DictionarySearch = () => {
 
   const API_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/";
 
+  
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
       setError("Please enter a valid word.");
@@ -32,7 +33,6 @@ const DictionarySearch = () => {
 
       const data = await response.json();
 
-      
       if (data && data[0] && data[0].meanings.length > 0) {
         const firstMeaning = data[0].meanings[0];
         const firstDefinition =
@@ -67,7 +67,7 @@ const DictionarySearch = () => {
             type="text"
             placeholder="Enter a word"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)} 
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button onClick={handleSearch}>Search</button>
         </div>
@@ -79,14 +79,20 @@ const DictionarySearch = () => {
       <footer className="app-footer">
         <p>
           Coded by <strong>Shanice Jones</strong> | Hosted on
-          <a href="" target="_blank" rel="noopener noreferrer">
-            {" "}
-            GitHub{" "}
+          <a
+            href="https://github.com/OShaniceO/dictionary-react"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
           </a>{" "}
           and
-          <a href="" target="_blank" rel="noopener noreferrer">
-            {" "}
-            Netlify{" "}
+          <a
+            href="https://willowy-kashata-3a436e.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Netlify
           </a>
         </p>
       </footer>
